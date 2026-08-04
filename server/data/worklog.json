@@ -1,1 +1,71 @@
-{}
+{
+  "2026-08-03": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "21:01",
+        "endTime": "21:10",
+        "duration": 9
+      },
+      {
+        "id": 2,
+        "startTime": "21:26",
+        "endTime": "21:50",
+        "duration": 24
+      }
+    ],
+    "totalMinutes": 33
+  },
+  "2026-08-04": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "09:55",
+        "endTime": "10:40",
+        "duration": 45
+      },
+      {
+        "id": 2,
+        "startTime": "10:55",
+        "endTime": "14:51",
+        "duration": 236
+      },
+      {
+        "id": 3,
+        "startTime": "14:58",
+        "endTime": "15:35",
+        "duration": 37
+      },
+      {
+        "id": 4,
+        "startTime": "17:10",
+        "endTime": "20:15",
+        "duration": 185
+      },
+      {
+        "id": 5,
+        "startTime": "21:20",
+        "endTime": "21:35",
+        "duration": 15
+      },
+      {
+        "id": 6,
+        "startTime": "23:10",
+        "endTime": "23:50",
+        "duration": 40
+      }
+    ],
+    "totalMinutes": 558
+  },
+  "2026-08-05": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "00:20",
+        "endTime": "00:50",
+        "duration": 30
+      }
+    ],
+    "totalMinutes": 30
+  }
+}
