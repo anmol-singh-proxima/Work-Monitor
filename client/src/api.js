@@ -22,6 +22,10 @@ export function getWorklog(date) {
   return request(`/${date}`);
 }
 
+export function getWeeklyWorklog(date) {
+  return request(`/week/${date}`);
+}
+
 export function addSession(date, session) {
   return request(`/${date}`, {
     method: 'POST',

@@ -83,6 +83,13 @@ h1 {
   line-height: 1.15;
 }
 
+h2 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
 .date-controls {
   display: grid;
   grid-template-columns: 44px minmax(150px, 170px) 44px;
@@ -264,6 +271,93 @@ td {
   line-height: 1.2;
 }
 
+.week-panel {
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 18px 45px rgba(37, 39, 35, 0.06);
+}
+
+.week-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid var(--line);
+  padding: 18px 16px;
+}
+
+.week-range {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.week-total {
+  display: grid;
+  gap: 4px;
+  min-width: 170px;
+  text-align: right;
+}
+
+.week-total span {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.week-total strong {
+  color: var(--accent-dark);
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+.week-message {
+  margin-bottom: 0;
+}
+
+.week-days {
+  display: grid;
+}
+
+.week-day {
+  display: grid;
+  grid-template-columns: minmax(190px, 1.4fr) minmax(100px, 0.8fr) minmax(130px, 1fr);
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  padding: 14px 16px;
+}
+
+.week-day:last-child {
+  border-bottom: 0;
+}
+
+.week-day-date {
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.week-day-sessions {
+  color: var(--muted);
+  font-weight: 750;
+}
+
+.week-day strong {
+  color: var(--ink);
+  font-size: 1rem;
+  text-align: right;
+}
+
+.week-empty {
+  color: var(--muted);
+  font-weight: 650;
+  padding: 24px 16px;
+  text-align: center;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -287,6 +381,10 @@ td {
 
   h1 {
     font-size: 1.65rem;
+  }
+
+  h2 {
+    font-size: 1.1rem;
   }
 
   .date-controls {
@@ -355,6 +453,27 @@ td {
   .total-block {
     border-top: 1px solid var(--line);
     padding-top: 16px;
+    text-align: left;
+  }
+
+  .week-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .week-total {
+    border-top: 1px solid var(--line);
+    min-width: 0;
+    padding-top: 14px;
+    text-align: left;
+  }
+
+  .week-day {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+
+  .week-day strong {
     text-align: left;
   }
 }

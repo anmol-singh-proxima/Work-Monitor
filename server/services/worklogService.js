@@ -17,6 +17,39 @@ function validateDate(date) {
   }
 }
 
+function parseDateValue(date) {
+  validateDate(date);
+  const [year, month, day] = date.split('-').map(Number);
+  return new Date(Date.UTC(year, month - 1, day));
+}
+
+function formatDateValue(date) {
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(date, dayOffset) {
+  const nextDate = new Date(date);
+  nextDate.setUTCDate(nextDate.getUTCDate() + dayOffset);
+  return nextDate;
+}
+
+function getMondayForDate(date) {
+  const dayOfWeek = date.getUTCDay();
+  const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  return addDays(date, -daysSinceMonday);
+}
+
+function getWeekDateValues(date) {
+  const weekStartDate = getMondayForDate(parseDateValue(date));
+
+  return Array.from({ length: 7 }, (_, index) => (
+    formatDateValue(addDays(weekStartDate, index))
+  ));
+}
+
 function parseTimeToMinutes(time, fieldName) {
   if (!time) {
     throw createError(`${fieldName} is required.`);
@@ -83,6 +116,28 @@ async function getDailyWorklog(date) {
   validateDate(date);
   const worklogs = await repository.readAll();
   return buildResponse(date, worklogs[date]);
+}
+
+async function getWeeklyWorklog(date) {
+  validateDate(date);
+  const worklogs = await repository.readAll();
+  const weekDates = getWeekDateValues(date);
+  const days = weekDates.map((weekDate) => {
+    const day = recalculateDay(worklogs[weekDate]);
+
+    return {
+      date: weekDate,
+      sessionsCount: day.sessions.length,
+      totalMinutes: day.totalMinutes
+    };
+  });
+
+  return {
+    weekStartDate: weekDates[0],
+    weekEndDate: weekDates[6],
+    days,
+    totalMinutes: days.reduce((total, day) => total + day.totalMinutes, 0)
+  };
 }
 
 async function createSession(date, input) {
@@ -155,6 +210,7 @@ async function deleteSession(date, id) {
 
 module.exports = {
   getDailyWorklog,
+  getWeeklyWorklog,
   createSession,
   updateSession,
   deleteSession,

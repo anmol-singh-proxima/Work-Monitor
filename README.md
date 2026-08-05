@@ -11,6 +11,7 @@ A simple full-stack web application for tracking daily work sessions. The app us
 - Automatically recalculate the daily total after every change.
 - Navigate to previous and next days.
 - Auto-select today's date on page load.
+- View the selected date's weekly summary from Monday through Sunday.
 - Store data in `server/data/worklog.json`.
 - Serve the React app and REST API from one Express server.
 
@@ -65,12 +66,15 @@ WORKLOG_DATA_FILE=server/data/worklog.json
 
 ```text
 GET    /api/worklog/:date
+GET    /api/worklog/week/:date
 POST   /api/worklog/:date
 PUT    /api/worklog/:date/:id
 DELETE /api/worklog/:date/:id
 ```
 
 Dates use `YYYY-MM-DD`.
+
+The weekly endpoint always uses Monday as the first day of the week and returns the date range for that week.
 
 ### Session Body
 
@@ -82,6 +86,23 @@ Dates use `YYYY-MM-DD`.
 ```
 
 The API calculates `duration` and `totalMinutes`; clients should not send those values.
+
+### Weekly Response
+
+```json
+{
+  "weekStartDate": "2026-08-03",
+  "weekEndDate": "2026-08-09",
+  "days": [
+    {
+      "date": "2026-08-03",
+      "sessionsCount": 2,
+      "totalMinutes": 165
+    }
+  ],
+  "totalMinutes": 165
+}
+```
 
 ## Data Storage
 

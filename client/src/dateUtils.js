@@ -28,3 +28,15 @@ export function formatReadableDate(dateValue) {
     year: 'numeric'
   }).format(date);
 }
+
+export function formatCompactDate(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).format(date);
+}

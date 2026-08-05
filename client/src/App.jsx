@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
-import { addSession, deleteSession, getWorklog, updateSession } from './api';
-import { formatReadableDate, getTodayInputValue, shiftDate } from './dateUtils';
+import { addSession, deleteSession, getWeeklyWorklog, getWorklog, updateSession } from './api';
+import {
+  formatCompactDate,
+  formatReadableDate,
+  getTodayInputValue,
+  shiftDate
+} from './dateUtils';
 import { calculateDuration, formatMinutes, validateSession } from './timeUtils';
 
 const emptySession = {
@@ -15,6 +20,9 @@ export default function App() {
   const [editingId, setEditingId] = useState(null);
   const [isAdding, setIsAdding] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [week, setWeek] = useState(null);
+  const [isWeekLoading, setIsWeekLoading] = useState(true);
+  const [weekMessage, setWeekMessage] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -26,21 +34,29 @@ export default function App() {
 
     async function loadDay() {
       setIsLoading(true);
+      setIsWeekLoading(true);
       setMessage('');
+      setWeekMessage('');
 
       try {
-        const nextDay = await getWorklog(selectedDate);
+        const [nextDay, nextWeek] = await Promise.all([
+          getWorklog(selectedDate),
+          getWeeklyWorklog(selectedDate)
+        ]);
         if (!ignore) {
           setDay(nextDay);
+          setWeek(nextWeek);
           resetForm();
         }
       } catch (error) {
         if (!ignore) {
           setMessage(error.message);
+          setWeekMessage(error.message);
         }
       } finally {
         if (!ignore) {
           setIsLoading(false);
+          setIsWeekLoading(false);
         }
       }
     }
@@ -88,6 +104,20 @@ export default function App() {
     }));
   }
 
+  async function refreshWeek() {
+    setIsWeekLoading(true);
+    setWeekMessage('');
+
+    try {
+      const nextWeek = await getWeeklyWorklog(selectedDate);
+      setWeek(nextWeek);
+    } catch (error) {
+      setWeekMessage(error.message);
+    } finally {
+      setIsWeekLoading(false);
+    }
+  }
+
   async function saveDraft() {
     const validationMessage = validateSession(draft);
     if (validationMessage) {
@@ -103,6 +133,7 @@ export default function App() {
         ? await addSession(selectedDate, draft)
         : await updateSession(selectedDate, editingId, draft);
       setDay(nextDay);
+      await refreshWeek();
       resetForm();
     } catch (error) {
       setMessage(error.message);
@@ -124,6 +155,7 @@ export default function App() {
     try {
       const nextDay = await deleteSession(selectedDate, session.id);
       setDay(nextDay);
+      await refreshWeek();
       if (editingId === session.id) {
         resetForm();
       }
@@ -275,8 +307,63 @@ export default function App() {
             </div>
           </div>
         </section>
+
+        <WeekSummary
+          week={week}
+          isLoading={isWeekLoading}
+          message={weekMessage}
+        />
       </section>
     </main>
+  );
+}
+
+function WeekSummary({ week, isLoading, message }) {
+  return (
+    <section className="week-panel" aria-labelledby="week-title">
+      <div className="week-header">
+        <div>
+          <p className="eyebrow">Week Summary</p>
+          <h2 id="week-title">
+            {week
+              ? `${formatCompactDate(week.weekStartDate)} - ${formatCompactDate(week.weekEndDate)}`
+              : 'Monday - Sunday'}
+          </h2>
+          <p className="week-range">
+            Weeks always start on Monday.
+          </p>
+        </div>
+
+        <div className="week-total">
+          <span>Week Total</span>
+          <strong>{formatMinutes(week?.totalMinutes || 0)}</strong>
+        </div>
+      </div>
+
+      {message && (
+        <p className="message week-message" role="alert">
+          {message}
+        </p>
+      )}
+
+      <div className="week-days" aria-label="Weekly daily totals">
+        {isLoading && (
+          <div className="week-empty">
+            Loading week summary...
+          </div>
+        )}
+
+        {!isLoading && week?.days.map((day) => (
+          <div className="week-day" key={day.date}>
+            <span className="week-day-date">{formatCompactDate(day.date)}</span>
+            <span className="week-day-sessions">
+              {day.sessionsCount} {day.sessionsCount === 1 ? 'session' : 'sessions'}
+            </span>
+            <strong>{formatMinutes(day.totalMinutes)}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
