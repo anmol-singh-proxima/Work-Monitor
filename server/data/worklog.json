@@ -103,5 +103,58 @@
       }
     ],
     "totalMinutes": 355
+  },
+  "2026-08-06": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "00:25",
+        "endTime": "01:25",
+        "duration": 60
+      },
+      {
+        "id": 2,
+        "startTime": "11:02",
+        "endTime": "11:50",
+        "duration": 48
+      },
+      {
+        "id": 3,
+        "startTime": "12:00",
+        "endTime": "12:19",
+        "duration": 19
+      },
+      {
+        "id": 4,
+        "startTime": "12:55",
+        "endTime": "13:30",
+        "duration": 35
+      },
+      {
+        "id": 5,
+        "startTime": "13:40",
+        "endTime": "13:55",
+        "duration": 15
+      },
+      {
+        "id": 6,
+        "startTime": "14:05",
+        "endTime": "14:35",
+        "duration": 30
+      },
+      {
+        "id": 7,
+        "startTime": "17:50",
+        "endTime": "18:30",
+        "duration": 40
+      },
+      {
+        "id": 8,
+        "startTime": "23:30",
+        "endTime": "23:59",
+        "duration": 29
+      }
+    ],
+    "totalMinutes": 276
   }
 }
