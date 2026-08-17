@@ -18,6 +18,24 @@ async function getWeeklyWorklog(req, res, next) {
   }
 }
 
+async function getMonthlyWorklog(req, res, next) {
+  try {
+    const month = await worklogService.getMonthlyWorklog(req.params.date);
+    res.json(month);
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getYearlyWorklog(req, res, next) {
+  try {
+    const year = await worklogService.getYearlyWorklog(req.params.year);
+    res.json(year);
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function createSession(req, res, next) {
   try {
     const day = await worklogService.createSession(req.params.date, req.body);
@@ -48,6 +66,8 @@ async function deleteSession(req, res, next) {
 module.exports = {
   getDailyWorklog,
   getWeeklyWorklog,
+  getMonthlyWorklog,
+  getYearlyWorklog,
   createSession,
   updateSession,
   deleteSession

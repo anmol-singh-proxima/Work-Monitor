@@ -50,6 +50,28 @@ function getWeekDateValues(date) {
   ));
 }
 
+function validateYear(year) {
+  if (!/^\d{4}$/.test(String(year))) {
+    throw createError('Year must be a 4-digit number.');
+  }
+}
+
+function getMonthDateValues(year, month) {
+  const daysInMonth = new Date(Date.UTC(year, month, 0)).getUTCDate();
+
+  return Array.from({ length: daysInMonth }, (_, index) => (
+    formatDateValue(new Date(Date.UTC(year, month - 1, index + 1)))
+  ));
+}
+
+function summarizeDays(days) {
+  const totalMinutes = days.reduce((total, day) => total + day.totalMinutes, 0);
+  const activeDays = days.filter((day) => day.sessionsCount > 0).length;
+  const averageMinutes = activeDays ? Math.round(totalMinutes / activeDays) : 0;
+
+  return { totalMinutes, activeDays, averageMinutes };
+}
+
 function parseTimeToMinutes(time, fieldName) {
   if (!time) {
     throw createError(`${fieldName} is required.`);
@@ -136,7 +158,90 @@ async function getWeeklyWorklog(date) {
     weekStartDate: weekDates[0],
     weekEndDate: weekDates[6],
     days,
-    totalMinutes: days.reduce((total, day) => total + day.totalMinutes, 0)
+    ...summarizeDays(days)
+  };
+}
+
+async function getMonthlyWorklog(date) {
+  validateDate(date);
+  const [year, month] = date.split('-').map(Number);
+  const worklogs = await repository.readAll();
+  const monthDates = getMonthDateValues(year, month);
+  const monthDateSet = new Set(monthDates);
+
+  const weekStartDates = [];
+  monthDates.forEach((monthDate) => {
+    const weekStart = formatDateValue(getMondayForDate(parseDateValue(monthDate)));
+    if (!weekStartDates.includes(weekStart)) {
+      weekStartDates.push(weekStart);
+    }
+  });
+
+  const weeks = weekStartDates.map((weekStart) => {
+    const weekDates = getWeekDateValues(weekStart);
+    const days = weekDates.map((weekDate) => {
+      const day = recalculateDay(worklogs[weekDate]);
+
+      return {
+        date: weekDate,
+        sessionsCount: day.sessions.length,
+        totalMinutes: day.totalMinutes,
+        inMonth: monthDateSet.has(weekDate)
+      };
+    });
+
+    return {
+      weekStartDate: weekDates[0],
+      weekEndDate: weekDates[6],
+      days,
+      ...summarizeDays(days.filter((day) => day.inMonth))
+    };
+  });
+
+  return {
+    year,
+    month,
+    monthStartDate: monthDates[0],
+    monthEndDate: monthDates[monthDates.length - 1],
+    daysInMonth: monthDates.length,
+    weeks,
+    ...summarizeDays(weeks.flatMap((week) => week.days.filter((day) => day.inMonth)))
+  };
+}
+
+async function getYearlyWorklog(yearInput) {
+  validateYear(yearInput);
+  const year = Number(yearInput);
+  const worklogs = await repository.readAll();
+
+  const monthsWithDays = Array.from({ length: 12 }, (_, index) => {
+    const month = index + 1;
+    const monthDates = getMonthDateValues(year, month);
+    const days = monthDates.map((monthDate) => {
+      const day = recalculateDay(worklogs[monthDate]);
+
+      return {
+        date: monthDate,
+        sessionsCount: day.sessions.length,
+        totalMinutes: day.totalMinutes
+      };
+    });
+
+    return {
+      month,
+      monthStartDate: monthDates[0],
+      daysInMonth: monthDates.length,
+      days,
+      ...summarizeDays(days)
+    };
+  });
+
+  const months = monthsWithDays.map(({ days, ...month }) => month);
+
+  return {
+    year,
+    months,
+    ...summarizeDays(monthsWithDays.flatMap((month) => month.days))
   };
 }
 
@@ -211,6 +316,8 @@ async function deleteSession(date, id) {
 module.exports = {
   getDailyWorklog,
   getWeeklyWorklog,
+  getMonthlyWorklog,
+  getYearlyWorklog,
   createSession,
   updateSession,
   deleteSession,

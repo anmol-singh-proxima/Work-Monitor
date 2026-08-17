@@ -4,6 +4,8 @@ const worklogController = require('../controllers/worklogController');
 const router = express.Router();
 
 router.get('/week/:date', worklogController.getWeeklyWorklog);
+router.get('/month/:date', worklogController.getMonthlyWorklog);
+router.get('/year/:year', worklogController.getYearlyWorklog);
 router.get('/:date', worklogController.getDailyWorklog);
 router.post('/:date', worklogController.createSession);
 router.put('/:date/:id', worklogController.updateSession);

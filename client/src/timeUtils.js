@@ -53,6 +53,39 @@ export function formatMinutes(minutes) {
   return parts.join(' ');
 }
 
+export function formatMinutesShort(minutes) {
+  if (!minutes) {
+    return '0m';
+  }
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  const parts = [];
+
+  if (hours > 0) {
+    parts.push(`${hours}h`);
+  }
+
+  if (remainingMinutes > 0) {
+    parts.push(`${remainingMinutes}m`);
+  }
+
+  return parts.join(' ');
+}
+
+export function getIntensityLevel(minutes, maxMinutes) {
+  if (!minutes || !maxMinutes) {
+    return 0;
+  }
+
+  const ratio = minutes / maxMinutes;
+
+  if (ratio <= 0.25) return 1;
+  if (ratio <= 0.5) return 2;
+  if (ratio <= 0.75) return 3;
+  return 4;
+}
+
 function parseTimeToMinutes(time) {
   const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(time);
 

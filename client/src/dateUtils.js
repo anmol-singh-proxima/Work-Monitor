@@ -40,3 +40,52 @@ export function formatCompactDate(dateValue) {
     year: 'numeric'
   }).format(date);
 }
+
+export function formatShortDate(dateValue) {
+  const [year, month, day] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1, day);
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short',
+    day: 'numeric'
+  }).format(date);
+}
+
+export function shiftMonth(dateValue, monthOffset) {
+  const [year, month] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1 + monthOffset, 1);
+  return formatDateInput(date);
+}
+
+export function shiftYear(dateValue, yearOffset) {
+  const [year, month] = dateValue.split('-').map(Number);
+  const date = new Date(year + yearOffset, month - 1, 1);
+  return formatDateInput(date);
+}
+
+export function formatMonthLabel(dateValue) {
+  const [year, month] = dateValue.split('-').map(Number);
+  const date = new Date(year, month - 1, 1);
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'long',
+    year: 'numeric'
+  }).format(date);
+}
+
+export function formatMonthName(year, month) {
+  const date = new Date(year, month - 1, 1);
+
+  return new Intl.DateTimeFormat(undefined, {
+    month: 'short'
+  }).format(date);
+}
+
+export function getYearValue(dateValue) {
+  return dateValue.split('-')[0];
+}
+
+export function getMonthStartValue(dateValue) {
+  const [year, month] = dateValue.split('-');
+  return `${year}-${month}-01`;
+}
