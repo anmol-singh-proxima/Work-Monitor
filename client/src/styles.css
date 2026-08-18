@@ -185,7 +185,116 @@ button:disabled {
   margin: 0 auto;
 }
 
-/* Top bar: tabs + theme toggle */
+/* App header: brand + live clock + theme toggle */
+
+.app-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.app-logo-mark {
+  flex-shrink: 0;
+  filter: drop-shadow(0 6px 14px rgba(18, 128, 95, 0.28));
+}
+
+.app-name {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.app-tagline {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.live-clock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-full);
+  background: var(--panel);
+  box-shadow: var(--shadow-sm);
+  padding: 0 14px;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.live-clock-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: live-dot-pulse 2s var(--ease) infinite;
+}
+
+@keyframes live-dot-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* App footer */
+
+.app-footer {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.app-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-weight: 800;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+}
+
+.app-footer-tagline {
+  margin: 0;
+  color: var(--muted-soft);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+/* Top bar: view tabs */
 
 .top-bar {
   display: flex;
@@ -286,7 +395,7 @@ button:disabled {
   text-transform: uppercase;
 }
 
-h1 {
+.page-title {
   margin: 0;
   color: var(--ink);
   font-size: 2rem;
@@ -1040,6 +1149,26 @@ td {
     padding: 24px 14px 48px;
   }
 
+  .app-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .app-tagline {
+    display: none;
+  }
+
+  .app-header-actions {
+    justify-content: space-between;
+  }
+
+  .live-clock {
+    flex: 1;
+    justify-content: center;
+  }
+
   .top-bar {
     margin-bottom: 20px;
   }
@@ -1049,7 +1178,7 @@ td {
     flex-direction: column;
   }
 
-  h1 {
+  .page-title {
     font-size: 1.6rem;
   }
 

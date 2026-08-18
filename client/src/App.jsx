@@ -8,12 +8,14 @@ import {
   getYearlyWorklog,
   updateSession
 } from './api';
+import Logo from './components/Logo';
 import MonthView from './components/MonthView';
 import { SkeletonRows } from './components/Skeleton';
 import ThemeToggle from './components/ThemeToggle';
 import ToastStack from './components/ToastStack';
 import YearView from './components/YearView';
 import {
+  formatClockTime,
   formatCompactDate,
   formatMonthLabel,
   formatReadableDate,
@@ -23,6 +25,7 @@ import {
   shiftDate,
   shiftMonth
 } from './dateUtils';
+import { useClock } from './hooks/useClock';
 import { useToasts } from './hooks/useToasts';
 import { calculateDuration, formatMinutes, validateSession } from './timeUtils';
 
@@ -62,6 +65,7 @@ export default function App() {
 
   const { toasts, pushToast, removeToast } = useToasts();
   const tabRefs = useRef([]);
+  const now = useClock();
 
   const activeFormKey = isAdding ? 'add' : editingId;
   const readableDate = useMemo(() => formatReadableDate(selectedDate), [selectedDate]);
@@ -320,7 +324,25 @@ export default function App() {
 
   return (
     <main className="app-shell">
-      <section className="workspace" aria-label="Work Monitor">
+      <section className="workspace">
+        <header className="app-header">
+          <div className="app-brand">
+            <Logo size={34} />
+            <div>
+              <h1 className="app-name">Work Monitor</h1>
+              <p className="app-tagline">Every session counted, one day at a time.</p>
+            </div>
+          </div>
+
+          <div className="app-header-actions">
+            <div className="live-clock" title="Current local time">
+              <span className="live-clock-dot" aria-hidden="true" />
+              <span>{formatClockTime(now)}</span>
+            </div>
+            <ThemeToggle />
+          </div>
+        </header>
+
         <div className="top-bar">
           <div className="view-tabs" role="tablist" aria-label="Worklog views">
             {tabs.map((tab, index) => (
@@ -343,8 +365,6 @@ export default function App() {
               </button>
             ))}
           </div>
-
-          <ThemeToggle />
         </div>
 
         {view === 'day' && (
@@ -352,7 +372,7 @@ export default function App() {
             <header className="page-header">
               <div>
                 <p className="eyebrow">Current Date</p>
-                <h1 id="page-title">{readableDate}</h1>
+                <h2 id="page-title" className="page-title">{readableDate}</h2>
               </div>
 
               <div className="date-controls" aria-label="Date navigation">
@@ -525,6 +545,14 @@ export default function App() {
             />
           </div>
         )}
+
+        <footer className="app-footer">
+          <div className="app-footer-brand">
+            <Logo size={20} />
+            <span>Work Monitor</span>
+          </div>
+          <p className="app-footer-tagline">Simple, focused time tracking.</p>
+        </footer>
       </section>
 
       <ToastStack toasts={toasts} onDismiss={removeToast} />
