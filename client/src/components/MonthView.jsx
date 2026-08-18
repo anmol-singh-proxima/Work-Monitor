@@ -1,5 +1,6 @@
 import { formatShortDate } from '../dateUtils';
 import { formatMinutes, formatMinutesShort, getIntensityLevel } from '../timeUtils';
+import { SkeletonRows } from './Skeleton';
 import StatTile from './StatTile';
 
 export default function MonthView({
@@ -44,7 +45,12 @@ export default function MonthView({
         </p>
       )}
 
-      {isLoading && <div className="week-empty">Loading month summary...</div>}
+      {isLoading && (
+        <div className="skeleton-panel">
+          <SkeletonRows count={3} className="skeleton-rows--stats" />
+          <SkeletonRows count={5} className="skeleton-rows--week" />
+        </div>
+      )}
 
       {!isLoading && month && (
         <>

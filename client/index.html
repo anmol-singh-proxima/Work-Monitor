@@ -4,6 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Work Monitor</title>
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('work-monitor-theme');
+          if (stored === 'light' || stored === 'dark') {
+            document.documentElement.dataset.theme = stored;
+          }
+        } catch (error) {
+          /* localStorage unavailable (private browsing, etc.) — fall back to system theme */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

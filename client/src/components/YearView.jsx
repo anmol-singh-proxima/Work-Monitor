@@ -1,5 +1,6 @@
 import { formatMonthName } from '../dateUtils';
 import { formatMinutes, formatMinutesShort, getIntensityLevel } from '../timeUtils';
+import { SkeletonRows } from './Skeleton';
 import StatTile from './StatTile';
 
 export default function YearView({
@@ -48,7 +49,12 @@ export default function YearView({
         </p>
       )}
 
-      {isLoading && <div className="week-empty">Loading year summary...</div>}
+      {isLoading && (
+        <div className="skeleton-panel">
+          <SkeletonRows count={3} className="skeleton-rows--stats" />
+          <SkeletonRows count={6} className="skeleton-rows--grid" />
+        </div>
+      )}
 
       {!isLoading && year && (
         <>

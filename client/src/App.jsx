@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   addSession,
   deleteSession,
@@ -9,6 +9,9 @@ import {
   updateSession
 } from './api';
 import MonthView from './components/MonthView';
+import { SkeletonRows } from './components/Skeleton';
+import ThemeToggle from './components/ThemeToggle';
+import ToastStack from './components/ToastStack';
 import YearView from './components/YearView';
 import {
   formatCompactDate,
@@ -20,12 +23,19 @@ import {
   shiftDate,
   shiftMonth
 } from './dateUtils';
+import { useToasts } from './hooks/useToasts';
 import { calculateDuration, formatMinutes, validateSession } from './timeUtils';
 
 const emptySession = {
   startTime: '',
   endTime: ''
 };
+
+const tabs = [
+  { key: 'day', label: 'Day' },
+  { key: 'month', label: 'Month' },
+  { key: 'year', label: 'Year' }
+];
 
 export default function App() {
   const [selectedDate, setSelectedDate] = useState(getTodayInputValue);
@@ -49,6 +59,9 @@ export default function App() {
   const [year, setYear] = useState(null);
   const [isYearLoading, setIsYearLoading] = useState(true);
   const [yearMessage, setYearMessage] = useState('');
+
+  const { toasts, pushToast, removeToast } = useToasts();
+  const tabRefs = useRef([]);
 
   const activeFormKey = isAdding ? 'add' : editingId;
   const readableDate = useMemo(() => formatReadableDate(selectedDate), [selectedDate]);
@@ -235,6 +248,26 @@ export default function App() {
     setView('month');
   }
 
+  function handleTabKeyDown(event, index) {
+    let nextIndex = null;
+
+    if (event.key === 'ArrowRight') {
+      nextIndex = (index + 1) % tabs.length;
+    } else if (event.key === 'ArrowLeft') {
+      nextIndex = (index - 1 + tabs.length) % tabs.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = tabs.length - 1;
+    }
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      setView(tabs[nextIndex].key);
+      tabRefs.current[nextIndex]?.focus();
+    }
+  }
+
   async function saveDraft() {
     const validationMessage = validateSession(draft);
     if (validationMessage) {
@@ -251,6 +284,7 @@ export default function App() {
         : await updateSession(selectedDate, editingId, draft);
       setDay(nextDay);
       await refreshSummaries();
+      pushToast(isAdding ? 'Session added.' : 'Session updated.');
       resetForm();
     } catch (error) {
       setMessage(error.message);
@@ -273,6 +307,7 @@ export default function App() {
       const nextDay = await deleteSession(selectedDate, session.id);
       setDay(nextDay);
       await refreshSummaries();
+      pushToast('Session deleted.');
       if (editingId === session.id) {
         resetForm();
       }
@@ -286,38 +321,34 @@ export default function App() {
   return (
     <main className="app-shell">
       <section className="workspace" aria-label="Work Monitor">
-        <div className="view-tabs" role="tablist" aria-label="Worklog views">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'day'}
-            className={`view-tab${view === 'day' ? ' is-active' : ''}`}
-            onClick={() => setView('day')}
-          >
-            Day
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'month'}
-            className={`view-tab${view === 'month' ? ' is-active' : ''}`}
-            onClick={() => setView('month')}
-          >
-            Month
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={view === 'year'}
-            className={`view-tab${view === 'year' ? ' is-active' : ''}`}
-            onClick={() => setView('year')}
-          >
-            Year
-          </button>
+        <div className="top-bar">
+          <div className="view-tabs" role="tablist" aria-label="Worklog views">
+            {tabs.map((tab, index) => (
+              <button
+                key={tab.key}
+                ref={(element) => {
+                  tabRefs.current[index] = element;
+                }}
+                type="button"
+                role="tab"
+                id={`tab-${tab.key}`}
+                aria-selected={view === tab.key}
+                aria-controls={`panel-${tab.key}`}
+                tabIndex={view === tab.key ? 0 : -1}
+                className={`view-tab${view === tab.key ? ' is-active' : ''}`}
+                onClick={() => setView(tab.key)}
+                onKeyDown={(event) => handleTabKeyDown(event, index)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <ThemeToggle />
         </div>
 
         {view === 'day' && (
-          <>
+          <div id="panel-day" role="tabpanel" aria-labelledby="tab-day" className="view-panel">
             <header className="page-header">
               <div>
                 <p className="eyebrow">Current Date</p>
@@ -375,7 +406,7 @@ export default function App() {
                     {isLoading && (
                       <tr>
                         <td colSpan="4" className="empty-cell">
-                          Loading sessions...
+                          <SkeletonRows count={2} className="skeleton-rows--lines" />
                         </td>
                       </tr>
                     )}
@@ -461,49 +492,79 @@ export default function App() {
               week={week}
               isLoading={isWeekLoading}
               message={weekMessage}
+              onPrevWeek={() => handleDateChange(shiftDate(selectedDate, -7))}
+              onNextWeek={() => handleDateChange(shiftDate(selectedDate, 7))}
             />
-          </>
+          </div>
         )}
 
         {view === 'month' && (
-          <MonthView
-            month={month}
-            monthLabel={monthLabel}
-            isLoading={isMonthLoading}
-            message={monthMessage}
-            onPrevMonth={() => setMonthDate((current) => shiftMonth(current, -1))}
-            onNextMonth={() => setMonthDate((current) => shiftMonth(current, 1))}
-            onSelectWeek={goToWeek}
-          />
+          <div id="panel-month" role="tabpanel" aria-labelledby="tab-month" className="view-panel">
+            <MonthView
+              month={month}
+              monthLabel={monthLabel}
+              isLoading={isMonthLoading}
+              message={monthMessage}
+              onPrevMonth={() => setMonthDate((current) => shiftMonth(current, -1))}
+              onNextMonth={() => setMonthDate((current) => shiftMonth(current, 1))}
+              onSelectWeek={goToWeek}
+            />
+          </div>
         )}
 
         {view === 'year' && (
-          <YearView
-            year={year}
-            yearLabel={yearValue}
-            isLoading={isYearLoading}
-            message={yearMessage}
-            onPrevYear={() => setYearValue((current) => String(Number(current) - 1))}
-            onNextYear={() => setYearValue((current) => String(Number(current) + 1))}
-            onSelectMonth={goToMonth}
-          />
+          <div id="panel-year" role="tabpanel" aria-labelledby="tab-year" className="view-panel">
+            <YearView
+              year={year}
+              yearLabel={yearValue}
+              isLoading={isYearLoading}
+              message={yearMessage}
+              onPrevYear={() => setYearValue((current) => String(Number(current) - 1))}
+              onNextYear={() => setYearValue((current) => String(Number(current) + 1))}
+              onSelectMonth={goToMonth}
+            />
+          </div>
         )}
       </section>
+
+      <ToastStack toasts={toasts} onDismiss={removeToast} />
     </main>
   );
 }
 
-function WeekSummary({ week, isLoading, message }) {
+function WeekSummary({ week, isLoading, message, onPrevWeek, onNextWeek }) {
   return (
     <section className="week-panel" aria-labelledby="week-title">
       <div className="week-header">
         <div>
-          <p className="eyebrow">Week Summary</p>
-          <h2 id="week-title">
-            {week
-              ? `${formatCompactDate(week.weekStartDate)} - ${formatCompactDate(week.weekEndDate)}`
-              : 'Monday - Sunday'}
-          </h2>
+          <div className="week-nav" aria-label="Week navigation">
+            <button
+              className="icon-button"
+              type="button"
+              aria-label="Previous week"
+              onClick={onPrevWeek}
+            >
+              &lt;
+            </button>
+
+            <div>
+              <p className="eyebrow">Week Summary</p>
+              <h2 id="week-title">
+                {week
+                  ? `${formatCompactDate(week.weekStartDate)} - ${formatCompactDate(week.weekEndDate)}`
+                  : 'Monday - Sunday'}
+              </h2>
+            </div>
+
+            <button
+              className="icon-button"
+              type="button"
+              aria-label="Next week"
+              onClick={onNextWeek}
+            >
+              &gt;
+            </button>
+          </div>
           <p className="week-range">
             Weeks always start on Monday.
           </p>
@@ -528,11 +589,7 @@ function WeekSummary({ week, isLoading, message }) {
       )}
 
       <div className="week-days" aria-label="Weekly daily totals">
-        {isLoading && (
-          <div className="week-empty">
-            Loading week summary...
-          </div>
-        )}
+        {isLoading && <SkeletonRows count={7} className="skeleton-rows--week" />}
 
         {!isLoading && week?.days.map((day) => (
           <div className="week-day" key={day.date}>
