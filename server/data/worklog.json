@@ -417,5 +417,145 @@
       }
     ],
     "totalMinutes": 360
+  },
+  "2026-08-18": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "01:00",
+        "endTime": "01:45",
+        "duration": 45
+      },
+      {
+        "id": 2,
+        "startTime": "11:00",
+        "endTime": "12:20",
+        "duration": 80
+      },
+      {
+        "id": 3,
+        "startTime": "15:05",
+        "endTime": "16:05",
+        "duration": 60
+      },
+      {
+        "id": 4,
+        "startTime": "16:25",
+        "endTime": "17:25",
+        "duration": 60
+      },
+      {
+        "id": 5,
+        "startTime": "17:45",
+        "endTime": "18:00",
+        "duration": 15
+      },
+      {
+        "id": 6,
+        "startTime": "19:15",
+        "endTime": "20:15",
+        "duration": 60
+      },
+      {
+        "id": 7,
+        "startTime": "21:10",
+        "endTime": "22:40",
+        "duration": 90
+      }
+    ],
+    "totalMinutes": 410
+  },
+  "2026-08-19": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "13:15",
+        "endTime": "13:45",
+        "duration": 30
+      },
+      {
+        "id": 2,
+        "startTime": "14:15",
+        "endTime": "17:00",
+        "duration": 165
+      },
+      {
+        "id": 3,
+        "startTime": "19:00",
+        "endTime": "20:00",
+        "duration": 60
+      }
+    ],
+    "totalMinutes": 255
+  },
+  "2026-08-20": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "10:40",
+        "endTime": "12:10",
+        "duration": 90
+      },
+      {
+        "id": 2,
+        "startTime": "13:05",
+        "endTime": "13:25",
+        "duration": 20
+      },
+      {
+        "id": 3,
+        "startTime": "13:40",
+        "endTime": "14:30",
+        "duration": 50
+      },
+      {
+        "id": 4,
+        "startTime": "14:40",
+        "endTime": "16:40",
+        "duration": 120
+      },
+      {
+        "id": 5,
+        "startTime": "18:40",
+        "endTime": "19:50",
+        "duration": 70
+      }
+    ],
+    "totalMinutes": 350
+  },
+  "2026-08-21": {
+    "sessions": [
+      {
+        "id": 1,
+        "startTime": "10:40",
+        "endTime": "11:30",
+        "duration": 50
+      },
+      {
+        "id": 2,
+        "startTime": "11:45",
+        "endTime": "12:30",
+        "duration": 45
+      },
+      {
+        "id": 3,
+        "startTime": "13:30",
+        "endTime": "15:15",
+        "duration": 105
+      },
+      {
+        "id": 4,
+        "startTime": "15:20",
+        "endTime": "16:05",
+        "duration": 45
+      },
+      {
+        "id": 5,
+        "startTime": "18:30",
+        "endTime": "19:00",
+        "duration": 30
+      }
+    ],
+    "totalMinutes": 275
   }
 }
